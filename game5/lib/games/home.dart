@@ -84,15 +84,15 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         title: const Center(
           child: Text(
             "Games",
-            style: TextStyle(color: Color.fromARGB(255, 248, 247, 246)),
+            style: TextStyle(color: Color.fromARGB(255, 7, 7, 7)),
           ),
         ),
       ),
-      backgroundColor: const Color.fromARGB(255, 12, 12, 12),
+      backgroundColor: Color.fromARGB(255, 250, 248, 248),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Column(

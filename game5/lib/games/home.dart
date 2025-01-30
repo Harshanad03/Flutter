@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:game5/games/memory_game_page.dart';
 import 'package:game5/games/Game2048.dart';
 import 'package:game5/games/snake_page.dart';
@@ -18,7 +17,7 @@ class HomePage extends StatelessWidget {
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => MemoryGame()));
         break;
-      case 'Stone paper':
+      case 'Stone Paper':
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => RockPaperScissorsGame()));
         break;
@@ -34,106 +33,144 @@ class HomePage extends StatelessWidget {
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => ConnectFourGame()));
         break;
-      // Add cases for other games similarly
       default:
         break;
     }
-  }
-
-  Widget _buildContainer(
-      BuildContext context, String containerName, Color color) {
-    return GestureDetector(
-      onTap: () => _navigateToGame(context, containerName),
-      child: Container(
-        height: 150,
-        margin: const EdgeInsets.all(10.0),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(10),
-          gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 156, 161, 161),
-              Color.fromARGB(255, 97, 222, 231),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Color.fromARGB(255, 242, 238, 238).withOpacity(0.2),
-              spreadRadius: 3,
-              blurRadius: 10,
-              offset: const Offset(0, 3), // changes position of shadow
-            ),
-          ],
-        ),
-        child: Center(
-          child: Text(
-            containerName,
-            style: const TextStyle(
-              fontSize: 24,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        backgroundColor: Colors.white,
         title: const Center(
           child: Text(
-            "Games",
-            style: TextStyle(color: Color.fromARGB(255, 7, 7, 7)),
+            "Games For You!",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
           ),
         ),
       ),
-      backgroundColor: Color.fromARGB(255, 250, 248, 248),
+      backgroundColor: Colors.blue.shade50,
       body: Padding(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
+            // Search Bar
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.blue.shade100,
+                    spreadRadius: 3,
+                    blurRadius: 10,
+                    offset: const Offset(3, 3),
+                  ),
+                  const BoxShadow(
+                    color: Colors.white,
+                    spreadRadius: 3,
+                    blurRadius: 10,
+                    offset: Offset(-3, -3),
+                  ),
+                ],
+              ),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: "Search your favorite game",
+                  filled: true,
+                  fillColor: Colors.white,
+                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Get Recommendations Button
+            ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color.fromARGB(255, 77, 186, 237),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                elevation: 5,
+                shadowColor: Colors.blue.shade200,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+              ),
+              child: const Text(
+                "Get Your Favorite Games",
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Title for Recommendations
+            const Text(
+              "Our Recommendations",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+
+            const SizedBox(height: 10),
+
+            // List of Games
             Expanded(
-              child: Row(
+              child: ListView(
                 children: [
-                  Expanded(
-                    child: _buildContainer(context, '2048', Colors.red),
-                  ),
-                  Expanded(
-                    child:
-                        _buildContainer(context, 'Memory Game', Colors.green),
-                  ),
+                  _buildGameTile(context, "2048"),
+                  _buildGameTile(context, "Memory Game"),
+                  _buildGameTile(context, "Stone Paper"),
+                  _buildGameTile(context, "Tic Tac Toe"),
+                  _buildGameTile(context, "Snake"),
+                  _buildGameTile(context, "Connect"),
                 ],
               ),
             ),
-            Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _buildContainer(context, 'Stone paper', Colors.blue),
-                  ),
-                  Expanded(
-                    child:
-                        _buildContainer(context, 'Tic Tac Toe', Colors.orange),
-                  ),
-                ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Widget to build each game tile
+  Widget _buildGameTile(BuildContext context, String gameName) {
+    return GestureDetector(
+      onTap: () => _navigateToGame(context, gameName),
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.blue.shade100,
+              spreadRadius: 2,
+              blurRadius: 8,
+              offset: const Offset(3, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: Colors.lightBlue.shade100,
+              child: Text(
+                (gameName[0]),
+                style: const TextStyle(fontSize: 20, color: Colors.black),
               ),
             ),
-            Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _buildContainer(context, 'Snake', Colors.purple),
-                  ),
-                  Expanded(
-                    child: _buildContainer(context, 'Connect', Colors.teal),
-                  ),
-                ],
-              ),
+            const SizedBox(width: 15),
+            Text(
+              gameName,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ],
         ),

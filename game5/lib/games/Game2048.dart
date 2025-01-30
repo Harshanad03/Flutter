@@ -38,61 +38,10 @@ class _Game2048State extends State<Game2048> {
   void resetGame() {
     setState(() {
       grid = List.generate(
-          widget.gridSize, (_) => List.generate(widget.gridSize, (_) => 0));
+          widget.gridSize, (i) => List<int>.filled(widget.gridSize, 0));
       addRandomTile();
       addRandomTile();
     });
-  }
-
-  bool moveLeft() {
-    bool moved = false;
-    for (int i = 0; i < widget.gridSize; i++) {
-      List<int> row = grid[i];
-      List<int> newRow = _mergeTiles(row);
-      if (!moved && !_listEquals(row, newRow)) moved = true;
-      grid[i] = newRow;
-    }
-    return moved;
-  }
-
-  bool moveRight() {
-    bool moved = false;
-    for (int i = 0; i < widget.gridSize; i++) {
-      List<int> row = grid[i].reversed.toList();
-      List<int> newRow = _mergeTiles(row).reversed.toList();
-      if (!moved && !_listEquals(row, newRow.reversed.toList())) moved = true;
-      grid[i] = newRow;
-    }
-    return moved;
-  }
-
-  bool moveUp() {
-    bool moved = false;
-    for (int i = 0; i < widget.gridSize; i++) {
-      List<int> column = [for (int j = 0; j < widget.gridSize; j++) grid[j][i]];
-      List<int> newColumn = _mergeTiles(column);
-      if (!moved && !_listEquals(column, newColumn)) moved = true;
-      for (int j = 0; j < widget.gridSize; j++) {
-        grid[j][i] = newColumn[j];
-      }
-    }
-    return moved;
-  }
-
-  bool moveDown() {
-    bool moved = false;
-    for (int i = 0; i < widget.gridSize; i++) {
-      List<int> column = [for (int j = 0; j < widget.gridSize; j++) grid[j][i]]
-          .reversed
-          .toList();
-      List<int> newColumn = _mergeTiles(column).reversed.toList();
-      if (!moved && !_listEquals(column, newColumn.reversed.toList()))
-        moved = true;
-      for (int j = 0; j < widget.gridSize; j++) {
-        grid[j][i] = newColumn[j];
-      }
-    }
-    return moved;
   }
 
   List<int> _mergeTiles(List<int> tiles) {
@@ -108,28 +57,20 @@ class _Game2048State extends State<Game2048> {
       ..setRange(0, newTiles.length, newTiles);
   }
 
-  bool _listEquals(List<int> a, List<int> b) {
-    if (a.length != b.length) return false;
-    for (int i = 0; i < a.length; i++) {
-      if (a[i] != b[i]) return false;
-    }
-    return true;
-  }
-
   void handleMove(String direction) {
     bool moved = false;
     switch (direction) {
       case 'left':
-        moved = moveLeft();
+        moved = _moveLeft();
         break;
       case 'right':
-        moved = moveRight();
+        moved = _moveRight();
         break;
       case 'up':
-        moved = moveUp();
+        moved = _moveUp();
         break;
       case 'down':
-        moved = moveDown();
+        moved = _moveDown();
         break;
     }
     if (moved) {
@@ -139,19 +80,54 @@ class _Game2048State extends State<Game2048> {
     }
   }
 
-  bool canMove() {
+  bool _moveLeft() {
+    bool moved = false;
     for (int i = 0; i < widget.gridSize; i++) {
+      List<int> row = grid[i];
+      List<int> newRow = _mergeTiles(row);
+      if (row != newRow) moved = true;
+      grid[i] = newRow;
+    }
+    return moved;
+  }
+
+  bool _moveRight() {
+    bool moved = false;
+    for (int i = 0; i < widget.gridSize; i++) {
+      List<int> row = grid[i].reversed.toList();
+      List<int> newRow = _mergeTiles(row).reversed.toList();
+      if (row != newRow.reversed.toList()) moved = true;
+      grid[i] = newRow;
+    }
+    return moved;
+  }
+
+  bool _moveUp() {
+    bool moved = false;
+    for (int i = 0; i < widget.gridSize; i++) {
+      List<int> column = [for (int j = 0; j < widget.gridSize; j++) grid[j][i]];
+      List<int> newColumn = _mergeTiles(column);
+      if (column != newColumn) moved = true;
       for (int j = 0; j < widget.gridSize; j++) {
-        if (grid[i][j] == 0) return true;
-        if (i > 0 && grid[i][j] == grid[i - 1][j]) return true;
-        if (i < widget.gridSize - 1 && grid[i][j] == grid[i + 1][j])
-          return true;
-        if (j > 0 && grid[i][j] == grid[i][j - 1]) return true;
-        if (j < widget.gridSize - 1 && grid[i][j] == grid[i][j + 1])
-          return true;
+        grid[j][i] = newColumn[j];
       }
     }
-    return false;
+    return moved;
+  }
+
+  bool _moveDown() {
+    bool moved = false;
+    for (int i = 0; i < widget.gridSize; i++) {
+      List<int> column = [for (int j = 0; j < widget.gridSize; j++) grid[j][i]]
+          .reversed
+          .toList();
+      List<int> newColumn = _mergeTiles(column).reversed.toList();
+      if (column != newColumn.reversed.toList()) moved = true;
+      for (int j = 0; j < widget.gridSize; j++) {
+        grid[j][i] = newColumn[j];
+      }
+    }
+    return moved;
   }
 
   @override
@@ -161,93 +137,113 @@ class _Game2048State extends State<Game2048> {
         leading: const BackButton(),
         title: const Center(child: Text('2048 Game')),
       ),
-      backgroundColor: Colors.black,
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Color.fromARGB(255, 255, 255, 255)!,
-                    const Color.fromARGB(255, 255, 253, 253)!
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                children: List.generate(widget.gridSize, (i) {
-                  return Row(
-                    children: List.generate(widget.gridSize, (j) {
-                      return Expanded(
-                        child: Container(
-                          margin: const EdgeInsets.all(4.0),
-                          decoration: BoxDecoration(
-                            color: grid[i][j] == 0
-                                ? const Color.fromARGB(255, 10, 10, 10)
-                                : Colors.greenAccent[grid[i][j] % 8 * 100],
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Center(
-                            child: Text(
-                              grid[i][j] == 0 ? '' : '${grid[i][j]}',
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                  );
-                }),
-              ),
-            ),
+            _buildGameBoard(),
             const SizedBox(height: 20),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildArrowButton(Icons.arrow_upward, 'up'),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildArrowButton(Icons.arrow_back, 'left'),
-                      const SizedBox(width: 30),
-                      _buildArrowButton(Icons.arrow_forward, 'right'),
-                    ],
-                  ),
-                  _buildArrowButton(Icons.arrow_downward, 'down'),
-                ],
-              ),
-            ),
+            _buildControlButtons(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildArrowButton(IconData icon, String direction) {
-    return ElevatedButton(
-      onPressed: () => handleMove(direction),
-      style: ElevatedButton.styleFrom(
-        shape: const CircleBorder(),
-        padding: const EdgeInsets.all(16),
-        backgroundColor: Colors.grey[800], // Button color
-        foregroundColor: Colors.white, // Icon color
+  Widget _buildGameBoard() {
+    return Container(
+      padding: const EdgeInsets.all(12.0),
+      decoration: BoxDecoration(
+        color: const Color.fromARGB(255, 51, 51, 51),
+        borderRadius: BorderRadius.circular(10),
       ),
-      child: Icon(icon),
+      child: Column(
+        children: List.generate(widget.gridSize, (i) {
+          return Row(
+            children: List.generate(widget.gridSize, (j) {
+              return Expanded(
+                child: Container(
+                  margin: const EdgeInsets.all(4.0),
+                  height: 70,
+                  decoration: BoxDecoration(
+                    color: _getTileColor(grid[i][j]),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Center(
+                    child: Text(
+                      grid[i][j] == 0 ? '' : '${grid[i][j]}',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          );
+        }),
+      ),
     );
+  }
+
+  Widget _buildControlButtons() {
+    return Column(
+      children: [
+        IconButton(
+          icon: const Icon(Icons.keyboard_arrow_up),
+          onPressed: () => handleMove('up'),
+          iconSize: 50,
+          color: Colors.black,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.keyboard_arrow_left),
+              onPressed: () => handleMove('left'),
+              iconSize: 50,
+              color: Colors.black,
+            ),
+            const SizedBox(width: 50),
+            IconButton(
+              icon: const Icon(Icons.keyboard_arrow_right),
+              onPressed: () => handleMove('right'),
+              iconSize: 50,
+              color: Colors.black,
+            ),
+          ],
+        ),
+        IconButton(
+          icon: const Icon(Icons.keyboard_arrow_down),
+          onPressed: () => handleMove('down'),
+          iconSize: 50,
+          color: Colors.black,
+        ),
+      ],
+    );
+  }
+
+  Color _getTileColor(int value) {
+    switch (value) {
+      case 2:
+        return Colors.blue[300]!;
+      case 4:
+        return Colors.green[300]!;
+      case 8:
+        return Colors.yellow[300]!;
+      case 16:
+        return Colors.orange[300]!;
+      case 32:
+        return Colors.red[300]!;
+      case 64:
+        return Colors.purple[300]!;
+      case 128:
+        return Colors.teal[300]!;
+      default:
+        return const Color.fromARGB(255, 201, 197, 197)!;
+    }
   }
 }

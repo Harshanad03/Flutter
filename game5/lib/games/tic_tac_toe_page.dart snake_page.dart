@@ -67,7 +67,7 @@ class _TicTacToeState extends State<TicTacToe> {
         ),
         centerTitle: true,
       ),
-      backgroundColor: Colors.black,
+      backgroundColor: const Color.fromARGB(255, 253, 253, 253),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -90,7 +90,7 @@ class _TicTacToeState extends State<TicTacToe> {
                           board[index],
                           style: const TextStyle(
                             fontSize: 40,
-                            color: Colors.white,
+                            color: Color.fromARGB(255, 0, 0, 0),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
